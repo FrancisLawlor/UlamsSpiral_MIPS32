@@ -10,7 +10,8 @@ Primes:		.space 65025					# Allocate space for array to store prime numbers
 main:
     		jal	ClearScreen				# Change pixels to white
     		jal	ClearMemory				# Clear memory in Primes array
-    		jal	CalculatePrimes				# Calculate Primes
+    		#jal	CalculatePrimes				# Calculate Primes
+    		jal	DisplaySpiral				# Display Spiral
     		li	$v0, 10
     		syscall
 
@@ -81,3 +82,10 @@ Increment:	addi	$s0, $s0, 1				# Move to next byte in Primes
 		
 		jr	$ra					# End subroutine
 		
+DisplaySpiral:
+		la	$t0, Pixels
+		addi	$t0, $t0, 131580
+		addi	$t3, $zero, 500				# Store hexadecimal value for white in register $t3
+		sw	$t3, 0($t0)				# Store word corresponding to white colour in Pixels array
+		
+		jr	$ra
