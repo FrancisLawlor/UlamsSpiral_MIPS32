@@ -70,14 +70,20 @@ DisplaySpiral:
 		addi	$t4, $zero, 500				# Store hexadecimal value for white in register $t3
 		addi	$t5, $zero, 0				# Counter for iterating through Primes
 		la	$t6, Primes				# Load address for Primes array
-		#sw	$t3, 0($t0)				# Store word corresponding to white colour in Pixels array
-Outerloop:	
 
+Outerloop:	
+		bne	$t5, 0, LoopRightSetup			# If Primes counter is zero, jump past two loops to avoid printing 0 and 1
+		addi	$t5, $t5, 2				# Set Primes counter to 2.
+		addi	$t0, $t0, 4				# Move right.
+		addi	$t0, $t0, -1024				# Move up.
+		j	Start
+
+LoopRightSetup:		
 		# Setup for LoopRight
 		addi	$t3, $zero, 0
 LoopRight:
 		## Do stuff
-		add	$t6, $t6, $t5
+		addi	$t5, $t5, 1				# Increment Primes counter.
 		lb	$t7, 0($t6)
 		bne	$t7, 0, skip1
 		sw	$t4, 0($t0)
@@ -87,11 +93,12 @@ skip1:		addi	$t0, $t0, 4				# Move right.
 		addi	$t6, $t6, 1				# Increment Primes array
 		bne	$t3, $t1, LoopRight
 
+		beq	$t5, 65025, FinishSpiral
 		# Setup for LoopUp
 		addi	$t3, $zero, 0
 LoopUp:
 		## Do stuff
-		add	$t6, $t6, $t5				# Move to next byte in Primes
+		addi	$t5, $t5, 1				# Increment Primes counter.
 		lb	$t7, 0($t6)				# Load current byte from Primes
 		bne	$t7, 0, skip2				# If current byte is not equal to 0
 		sw	$t4, 0($t0)				# Save word in current element of grid
@@ -102,18 +109,15 @@ skip2:		addi	$t0, $t0, -1024				# Move up.
 		bne	$t3, $t1, LoopUp
 
 		# Setup for LoopLeft
-		addi	$t1, $t1, 1				# x++
+Start:		addi	$t1, $t1, 1				# x++
 		addi	$t3, $zero, 0
 		
-		beq	$t1, 256, FinishSpiral
 LoopLeft:
 		## Do stuff
-		add	$t6, $t6, $t5				# Move to next byte in Primes
+		addi	$t5, $t5, 1				# Increment Primes counter.
 		lb	$t7, 0($t6)				# Load current byte from Primes
 		bne	$t7, 0, skip3				# If current byte is not equal to 0
 		sw	$t4, 0($t0)				# Save word in current element of grid
-
-		#sw	$t4, 0($t0)
 		
 skip3:		addi	$t0, $t0, -4				# Move left.
 		addi	$t3, $t3, 1
@@ -125,7 +129,7 @@ skip3:		addi	$t0, $t0, -4				# Move left.
 LoopDown:
 
 		## Do stuff
-		add	$t6, $t6, $t5				# Move to next byte in Primes
+		addi	$t5, $t5, 1				# Increment Primes counter.
 		lb	$t7, 0($t6)				# Load current byte from Primes
 		bne	$t7, 0, skip4				# If current byte is not equal to 0
 		sw	$t4, 0($t0)	
@@ -140,12 +144,5 @@ skip4:		addi	$t0, $t0, 1024				# Move left.
 
 		addi	$t3, $zero, 0
 FinishSpiral:	
-
-		## Do stuff
-		sw	$t4, 0($t0)
-		
-		addi	$t0, $t0, -4				# Move left.
-		addi	$t3, $t3, 1
-		bne	$t3, $t1, FinishSpiral
 		
 		jr	$ra
