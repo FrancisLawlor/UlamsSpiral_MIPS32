@@ -11,6 +11,7 @@ Primes:		.space 65025					# Allocate space for array to store prime numbers
 main:
 		la	$a0, Pixels				# Load address of Pixels array to be passed to ClearScreen subroutine
     		jal	ClearScreen				# Change pixels to white
+    		la	$a0, Primes				# Load address of Primes array to be passed to ClearMemory subroutine
     		jal	ClearMemory				# Clear memory in Primes array
     		jal	CalculatePrimes				# Calculate Primes
     		jal	DisplaySpiral				# Display Spiral
@@ -34,14 +35,14 @@ loop:
     		jr	$ra					# End subroutine
     		
 ClearMemory:
-		la	$s0, Primes				# Load address to populate memory with zeroes
-		add	$s0, $s0, 2				# First two bytes are not populated, as per algorithm
+		la	$a0, Primes				# Load address to populate memory with zeroes
+		add	$a0, $a0, 2				# First two bytes are not populated, as per algorithm
 		addi	$s3, $zero, 0				# Store zero for use in storing zeros in FindPrime
 		addi	$s5, $zero, 2				# Store minimum value, 2 (used as counter)
 		addi	$s7, $zero, 65025			# Store maximum value, 1000 (used for guard)
 		
-StoreZero:	sb	$s3, ($s0)				# Store zero at current byte in $s0
-		addi	$s0, $s0, 1				# Move to next byte
+StoreZero:	sb	$s3, ($a0)				# Store zero at current byte in $s0
+		addi	$a0, $a0, 1				# Move to next byte
 		addi	$s5, $s5, 1				# Increment counter
 		bne	$s5, $s7, StoreZero			# Loop until counter reaches maximum value
 		
