@@ -50,7 +50,7 @@ CalculatePrimes:
 		la	$s0, Primes				# set data pointer
 		li      $s1, 2                  		# set the current base
 		li      $s2, 1                 	 		# strikeout constant
-		li      $s3, 65026              			# set end of array + 1
+		li      $s3, 65026              		# set end of array + 1
 		li      $s4, 32769                		# set last base + 1
 loopBase:	add	$s5, $s1, $s1				# copy 2*base to the current value
 loopSweep:	add	$t0, $s0, $s5				# calculate the address of the current byte
@@ -63,86 +63,84 @@ loopSweep:	add	$t0, $s0, $s5				# calculate the address of the current byte
 		jr	$ra					# End subroutine
 		
 DisplaySpiral:
-		la	$t0, Pixels
-		addi	$t0, $t0, 131580			# Curr = 131580
-		addi	$t1, $zero, +1				# x = 1
-		add	$t2, $zero, 256				# Width
-		addi	$t4, $zero, 500				# Store hexadecimal value for white in register $t3
+		la	$t0, Pixels				# Load address corresponding to Pixels array
+		addi	$t0, $t0, 131580			# Set initial word for our spiral
+		addi	$t1, $zero, 1				# Initialise to 1 the variable which keeps track of how many moves are possible in each direction.
+		add	$t2, $zero, 256				# Store width for use in OuterLoop
+		addi	$t4, $zero, 500				# Store colour other than white for marking primes.
 		addi	$t5, $zero, 0				# Counter for iterating through Primes
 		la	$t6, Primes				# Load address for Primes array
 
-Outerloop:	
-		bne	$t5, 0, LoopRightSetup			# If Primes counter is zero, jump past two loops to avoid printing 0 and 1
-		addi	$t5, $t5, 2				# Set Primes counter to 2.
-		addi	$t0, $t0, 4				# Move right.
-		addi	$t0, $t0, -1024				# Move up.
-		j	Start
+OuterLoop:	
+		bne	$t5, 0, LoopRightSetup			# If Primes counter is not equal to 0, jump straight to first loop
+		addi	$t5, $t5, 2				# Set Primes counter to 2
+		addi	$t0, $t0, 4				# Move right in grid
+		addi	$t0, $t0, -1024				# Move up in grid
+		j	Start					# Jump past first two loops to avoid output for 0 and 1
 
 LoopRightSetup:		
 		# Setup for LoopRight
-		addi	$t3, $zero, 0
-LoopRight:
-		## Do stuff
-		addi	$t5, $t5, 1				# Increment Primes counter.
-		lb	$t7, 0($t6)
-		bne	$t7, 0, skip1
-		sw	$t4, 0($t0)
+		addi	$t3, $zero, 0				# Initialise LoopRight counter to 0
 		
-skip1:		addi	$t0, $t0, 4				# Move right.
-		addi	$t3, $t3, 1
-		addi	$t6, $t6, 1				# Increment Primes array
-		bne	$t3, $t1, LoopRight
-
-		beq	$t5, 65025, FinishSpiral
-		# Setup for LoopUp
-		addi	$t3, $zero, 0
-LoopUp:
-		## Do stuff
-		addi	$t5, $t5, 1				# Increment Primes counter.
+LoopRight:
+		addi	$t5, $t5, 1				# Increment Primes counter
 		lb	$t7, 0($t6)				# Load current byte from Primes
-		bne	$t7, 0, skip2				# If current byte is not equal to 0
-		sw	$t4, 0($t0)				# Save word in current element of grid
-				
-skip2:		addi	$t0, $t0, -1024				# Move up.
-		addi	$t3, $t3, 1
-		addi	$t6, $t6, 1				# Increment Primes array
-		bne	$t3, $t1, LoopUp
+		bne	$t7, 0, skip1				# If current byte is not 0 then skip the storing step
+		sw	$t4, 0($t0)				# Store different colour in current word of grid
+		
+skip1:		addi	$t0, $t0, 4				# Move right in grid
+		addi	$t3, $t3, 1				# Increment LoopRight counter
+		addi	$t6, $t6, 1				# Move to next element in Primes
+		bne	$t3, $t1, LoopRight			# Reiterate while $t3 is less than $t1
 
+		beq	$t5, 65025, FinishSpiral		# 65025 should be reached by the counter before the final upward maneuver.
+		
+		# Setup for LoopUp
+		addi	$t3, $zero, 0				# Initialise LoopUp counter to 0
+LoopUp:
+		addi	$t5, $t5, 1				# Increment Primes counter
+		lb	$t7, 0($t6)				# Load current byte from Primes
+		bne	$t7, 0, skip2				# If current byte is not 0 then skip the storing step
+		sw	$t4, 0($t0)				# Store different colour in current word of grid
+				
+skip2:		addi	$t0, $t0, -1024				# Move up in grid
+		addi	$t3, $t3, 1				# Increment LoopUp counter
+		addi	$t6, $t6, 1				# Move to next element in Primes
+		bne	$t3, $t1, LoopUp			# Reiterate while $t3 is less than $t1
+
+Start:								# Start label refers to beginning of traversal of grid after skipping 0 and 1
+		addi	$t1, $t1, 1				# Increment number of iterations for traversal loops as number of positions changes each time direction changes twice
+		
 		# Setup for LoopLeft
-Start:		addi	$t1, $t1, 1				# x++
-		addi	$t3, $zero, 0
+		addi	$t3, $zero, 0				# Initialise LoopLeft counter to 0
 		
 LoopLeft:
-		## Do stuff
-		addi	$t5, $t5, 1				# Increment Primes counter.
+		addi	$t5, $t5, 1				# Increment Primes counter
 		lb	$t7, 0($t6)				# Load current byte from Primes
-		bne	$t7, 0, skip3				# If current byte is not equal to 0
-		sw	$t4, 0($t0)				# Save word in current element of grid
+		bne	$t7, 0, skip3				# If current byte is not 0 then skip the storing step
+		sw	$t4, 0($t0)				# Store different colour in current word of grid
 		
-skip3:		addi	$t0, $t0, -4				# Move left.
-		addi	$t3, $t3, 1
-		addi	$t6, $t6, 1				# Increment Primes array
-		bne	$t3, $t1, LoopLeft
+skip3:		addi	$t0, $t0, -4				# Move left in grid
+		addi	$t3, $t3, 1				# Increment LoopLeft counter
+		addi	$t6, $t6, 1				# Move to next element in Primes
+		bne	$t3, $t1, LoopLeft			# Reiterate while $t3 is less than $t1
 		
 		# Setup for LoopDown
-		addi	$t3, $zero, 0
+		addi	$t3, $zero, 0				# Initialise LoopDown counter to 0
 LoopDown:
-
-		## Do stuff
 		addi	$t5, $t5, 1				# Increment Primes counter.
 		lb	$t7, 0($t6)				# Load current byte from Primes
-		bne	$t7, 0, skip4				# If current byte is not equal to 0
-		sw	$t4, 0($t0)	
+		bne	$t7, 0, skip4				# If current byte is not 0 then skip the storing step
+		sw	$t4, 0($t0)				# Store different colour in current word of grid
 		
-skip4:		addi	$t0, $t0, 1024				# Move left.
-		addi	$t3, $t3, 1
-		addi	$t6, $t6, 1				# Increment Primes array
-		bne	$t3, $t1, LoopDown
+skip4:		addi	$t0, $t0, 1024				# Move down in grid
+		addi	$t3, $t3, 1				# Increment LoopDown counter
+		addi	$t6, $t6, 1				# Move to next element in Primes
+		bne	$t3, $t1, LoopDown			# Reiterate while $t3 is less than $t1
 		
-		addi	$t1, $t1, 1
-		bne	$t1, $t2, Outerloop
-
-		addi	$t3, $zero, 0
+		addi	$t1, $t1, 1				# Increment OuterLoop counter
+		bne	$t1, $t2, OuterLoop			# Reiterate OuterLoop while $t1 is less than $t2
+		
 FinishSpiral:	
-		
-		jr	$ra
+
+		jr	$ra					# End subroutine
