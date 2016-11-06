@@ -50,8 +50,8 @@ CalculatePrimes:
 		la	$s0, Primes				# set data pointer
 		li      $s1, 2                  		# set the current base
 		li      $s2, 1                 	 		# strikeout constant
-		li      $s3, 1001              			# set end of array + 1
-		li      $s4, 501                		# set last base + 1
+		li      $s3, 65026              			# set end of array + 1
+		li      $s4, 32769                		# set last base + 1
 loopBase:	add	$s5, $s1, $s1				# copy 2*base to the current value
 loopSweep:	add	$t0, $s0, $s5				# calculate the address of the current byte
 		sb      $s2, 0($t0)				# strike out the current byte
@@ -79,7 +79,7 @@ LoopRight:
 		## Do stuff
 		add	$t6, $t6, $t5
 		lb	$t7, 0($t6)
-		bne	$t7, 1, skip1
+		bne	$t7, 0, skip1
 		sw	$t4, 0($t0)
 		
 skip1:		addi	$t0, $t0, 4				# Move right.
@@ -91,24 +91,33 @@ skip1:		addi	$t0, $t0, 4				# Move right.
 		addi	$t3, $zero, 0
 LoopUp:
 		## Do stuff
+		add	$t6, $t6, $t5				# Move to next byte in Primes
+		lb	$t7, 0($t6)				# Load current byte from Primes
+		bne	$t7, 0, skip2				# If current byte is not equal to 0
+		sw	$t4, 0($t0)				# Save word in current element of grid
 				
-		addi	$t0, $t0, -1024				# Move up.
+skip2:		addi	$t0, $t0, -1024				# Move up.
 		addi	$t3, $t3, 1
+		addi	$t6, $t6, 1				# Increment Primes array
 		bne	$t3, $t1, LoopUp
 
 		# Setup for LoopLeft
 		addi	$t1, $t1, 1				# x++
 		addi	$t3, $zero, 0
-		# TODO
 		
 		beq	$t1, 256, FinishSpiral
 LoopLeft:
 		## Do stuff
-		
+		add	$t6, $t6, $t5				# Move to next byte in Primes
+		lb	$t7, 0($t6)				# Load current byte from Primes
+		bne	$t7, 0, skip3				# If current byte is not equal to 0
+		sw	$t4, 0($t0)				# Save word in current element of grid
+
 		#sw	$t4, 0($t0)
 		
-		addi	$t0, $t0, -4				# Move left.
+skip3:		addi	$t0, $t0, -4				# Move left.
 		addi	$t3, $t3, 1
+		addi	$t6, $t6, 1				# Increment Primes array
 		bne	$t3, $t1, LoopLeft
 		
 		# Setup for LoopDown
@@ -116,9 +125,14 @@ LoopLeft:
 LoopDown:
 
 		## Do stuff
+		add	$t6, $t6, $t5				# Move to next byte in Primes
+		lb	$t7, 0($t6)				# Load current byte from Primes
+		bne	$t7, 0, skip4				# If current byte is not equal to 0
+		sw	$t4, 0($t0)	
 		
-		addi	$t0, $t0, 1024				# Move left.
+skip4:		addi	$t0, $t0, 1024				# Move left.
 		addi	$t3, $t3, 1
+		addi	$t6, $t6, 1				# Increment Primes array
 		bne	$t3, $t1, LoopDown
 		
 		addi	$t1, $t1, 1
