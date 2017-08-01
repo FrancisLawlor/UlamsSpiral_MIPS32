@@ -1,6 +1,6 @@
 # Ulam's Spiral
-	
-![BitMapDisplay](BitmapDisplay.png)
+
+![BitMapDisplay](DisplayImage.png)
 
 MIPS32 Assembly Language program that display's [Ulam's Spiral](http://mathworld.wolfram.com/PrimeSpiral.html) on the MARS Bitmap Display.
 
