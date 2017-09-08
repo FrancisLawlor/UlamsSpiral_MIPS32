@@ -1,6 +1,3 @@
-# Student Name: Francis Lawlor
-# Student Number: 14461158
-
 		.data
 Pixels:		.space 262144					# Allocate space for array to store words corresponding to pixel colours
 Primes:		.space 65025					# Allocate space for array to store prime numbers
