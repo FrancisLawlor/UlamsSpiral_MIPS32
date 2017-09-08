@@ -11,7 +11,7 @@
 
 All primes up to 65025 are shown.
 
-###Instructions for use:
+### Instructions:
 
 * open program with [Mars](http://courses.missouristate.edu/KenVollmar/mars/download.htm)
 * click Tools -> Bitmap Display -> Connect to MIPS
